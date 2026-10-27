@@ -1,0 +1,15 @@
+# Local tools and temporary artifacts
+/.runtime/
+/keyspace-online/
+/output/
+/tmp/
+**/node_modules/
+**/__pycache__/
+*.py[cod]
+.DS_Store
+Thumbs.db
+
+# Environment secrets
+.env
+.env.*
+!.env.example

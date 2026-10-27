@@ -11,7 +11,7 @@ const raw = () => Object.fromEntries(inputs.map(k=>[k,$(k).value]));
 const text = (id,value) => { $(id).textContent = value; };
 const expression = (base,exponent,modulus,result) => `${base}<sup>${exponent}</sup> mod ${modulus}${result === undefined ? '' : ` = <b>${result}</b>`}`;
 const hiddenAnswer = () => $('practice').checked && !revealed;
-function stop() { clearInterval(timer); timer=null; text('play','▶ Play all'); $('play').setAttribute('aria-label','Play all steps'); }
+function stop() { clearInterval(timer); timer=null; text('play',stage===3?'↺ Run again':'▶ Start exchange'); $('play').setAttribute('aria-label',stage===3?'Run exchange again':'Start exchange'); }
 function compute() {
   try {
     values = DH.validate(raw(),attack);
@@ -61,8 +61,8 @@ function render() {
     $(`secret-block-${side}`).classList.toggle('done',stage===3&&valid&&!hide);
   }
   text('packet-a',stage>=1&&valid?`YA = ${r.ya}`:'YA');text('packet-b',stage>=1&&valid?`YB = ${r.yb}`:'YB');
-  const titles=['Ready when you are.','Public. Not private.','Across the open channel.','Same secret. Both sides.'];
-  const descriptions=['Private inputs. Public exchange.<br>A secret only they can calculate.','Each turns a private number<br>into a public key.','Alice sends YA. Bob sends YB.<br>Their private keys stay put.','Different calculations.<br>One shared result.'];
+  const titles=['Ready to connect','Public keys ready','Exchanging keys…','Secrets match'];
+  const descriptions=['Only public keys travel.','Each person has a public key.','Private keys stay with their owner.','The secret was never sent.'];
   text('channel-title',titles[stage]);$('channel-description').innerHTML=descriptions[stage];
   text('connection-symbol',stage===3?'✓':'↔');text('channel-badge',stage===3?'KEY AGREEMENT COMPLETE':'OPEN CHANNEL');
   $('forged-keys').innerHTML=stage>=1&&valid?`To Alice: Y<sub>DA</sub> = ${r.toA}<br>To Bob: Y<sub>DB</sub> = ${r.toB}`:'Two identities. Two key exchanges.';
@@ -75,10 +75,11 @@ function render() {
     if(weak) $('outcome').innerHTML+='<br>Learning note: a private exponent of q − 1 produces the trivial public key 1. Choose a smaller exponent for a more useful example.';
   }
   document.querySelectorAll('[data-step]').forEach(button=>{const n=Number(button.dataset.step);button.classList.toggle('current',n===stage);button.classList.toggle('complete',n<stage);button.setAttribute('aria-current',n===stage?'step':'false');button.disabled=!valid;});
-  const nextLabels=['Generate public keys','Exchange public keys','Calculate the secret','Replay exchange'];
+  const nextLabels=['Public keys','Send keys','Find secret','Reset'];
   $('next').innerHTML=`${nextLabels[stage]} <span>${stage===3?'↺':'→'}</span>`; $('next').disabled=!valid; $('play').disabled=!valid;
-  const captions=attack?['01 — Choose the keys. Darth has a separate private exponent for each side of the connection.','02 — Alice and Bob calculate their public keys. Darth prepares two replacement keys.','03 — Darth intercepts YA and YB. Alice and Bob each receive a forged key from Darth.','04 — Alice and Bob each agree on a secret with Darth. No identity check means no way to detect the substitution.']:['01 — Choose public parameters and a private key for each person. Then start the exchange.','02 — Each public key is α raised to a private exponent, reduced modulo q. These values are safe to share with suitable parameters.','03 — Only public keys cross the channel. Alice’s private key and Bob’s private key never leave their owners.','04 — Each person raises the received public key to their own private exponent, modulo q. Their results match.'];
+  const captions=attack?['Enter the keys. Darth has a private key for each side.','Everyone calculates a public key.','Darth intercepts and replaces both public keys.','Darth now knows a secret with each person.']:['Enter the private keys, then start the exchange.','Public keys = α raised to each private key, modulo q.','Alice and Bob send their public keys to each other.','Both calculate the same secret using their private keys.'];
   text('step-caption',captions[stage]);
+  if(!timer) { text('play',stage===3?'↺ Run again':'▶ Start exchange'); $('play').setAttribute('aria-label',stage===3?'Run exchange again':'Start exchange'); }
   $('practice-form').hidden=!$('practice').checked||stage!==3||!valid;
   text('practice-question',attack?'What secret does Alice share with Darth?':'What shared secret did Alice calculate?');
   mathContent();
@@ -104,7 +105,11 @@ $('play').addEventListener('click',()=>{
   if(timer){stop();return;}
   if(!compute()){render();return;}
   if(stage===3) stage=0;
-  clearPractice();render();text('play','Ⅱ Pause');$('play').setAttribute('aria-label','Pause playback');
+  clearPractice();
+  stage=Math.min(stage+1,3);
+  render();
+  if(stage===3){stop();return;}
+  text('play','Ⅱ Pause');$('play').setAttribute('aria-label','Pause playback');
   timer=setInterval(()=>{stage++;render();if(stage>=3)stop();},1700);
 });
 $('practice').addEventListener('change',()=>{clearPractice();render();});

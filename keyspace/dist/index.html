@@ -1,47 +1,68 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#f7f8f2"><meta name="description" content="See Diffie–Hellman happen. An interactive key exchange lab with step-by-step math, practice mode, and a man-in-the-middle simulation.">
-  <title>Keyspace — Diffie–Hellman, made visible</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23285c46'/%3E%3Ctext x='12' y='45' font-size='42' fill='%23d7f3a0'%3E↔%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css"><script src="math.js" defer></script><script src="app.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1118">
+  <meta name="description" content="A simple visual Diffie–Hellman calculator. Enter two private keys, exchange public keys, and find the shared secret.">
+  <title>Keyspace — Diffie–Hellman key exchange</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2316202c'/%3E%3Ctext x='10' y='46' font-size='44' fill='%2390d8b4'%3E%26%238594;%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="math.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
 <body>
-<header class="site-header"><a class="brand" href="#"><span class="brand-mark">↔</span> keyspace<span class="brand-dot">.</span></a><nav aria-label="Main navigation"><a class="nav-active" href="#lab">The playground</a><a href="#understand">How it works <span>↗</span></a></nav><span class="header-note"><i></i> A little math. A shared secret.</span></header>
-<main>
-  <section class="hero"><div><span class="eyebrow"><span class="tiny-square"></span> THE DIFFIE–HELLMAN PLAYGROUND</span><h1>A shared secret.<br>An <em>open channel.</em></h1><p>Two people. A little modular magic. See how a secret is<br class="desktop-break"> created without ever being sent.</p></div><div class="hero-aside"><div class="orbit-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><span class="orbit-a">A</span><span class="orbit-b">B</span><span class="orbit-key">✳</span><span class="orbit-number">α<sup>x</sup> mod q</span></div><p>Make the math click.<br><strong>One exchange at a time.</strong></p></div></section>
-
-  <section id="lab" class="lab" aria-label="Diffie–Hellman interactive playground">
-    <div class="lab-heading"><div class="section-label"><span>01 /</span> Your key exchange</div><div class="mode-switch" role="group" aria-label="Exchange mode"><button id="normal-mode" class="selected" aria-pressed="true">↔ &nbsp; Classic exchange</button><button id="attack-mode" aria-pressed="false">⌁ &nbsp; Man in the middle</button></div></div>
-    <div class="setup-panel"><div class="setup-intro"><span class="mini-label">START WITH THE BASICS</span><h2>Public parameters</h2><p>Everyone can see these.</p></div><label class="field"><span>Prime number <b>q</b></span><input id="q" inputmode="numeric" value="353" autocomplete="off" aria-describedby="limits"><small>The world our numbers live in</small></label><label class="field"><span>Generator <b>α</b></span><input id="alpha" inputmode="numeric" value="3" autocomplete="off"><small>A primitive root of q</small></label><div class="example-field"><label for="preset">NEED A STARTING POINT?</label><select id="preset"><option value="chapter">Chapter example · q = 353</option><option value="small">Small &amp; simple · q = 23</option><option value="tiny">Try it by hand · q = 7</option><option value="custom">Your own example</option></select><button class="text-button" id="randomize">⤨ &nbsp; Give me a random example</button></div></div>
-    <div id="validation" class="validation" role="alert" hidden></div>
-    <div class="workspace-bar"><span id="channel-label"><i class="status-dot"></i> PUBLIC CHANNEL <span class="subtle">/ private keys stay with their owner</span></span><label class="practice-toggle"><input type="checkbox" id="practice"><span class="switch-track"></span> Test yourself <span class="help-dot" title="Hide the final secret and check your own calculation.">?</span></label></div>
-    <div class="exchange-grid" id="exchange-grid">
-      <article class="person-card alice"><div class="person-heading"><div class="avatar avatar-alice" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M10 64c0-16 10-25 22-25s22 9 22 25" fill="#406754"/><ellipse cx="32" cy="27" rx="13" ry="16" fill="#f1c5a3"/><path d="M17 29c-4-17 6-25 16-24 11 1 18 12 13 27l-4-13c-8 3-13-1-16-3l-4 15Z" fill="#3c3933"/><path d="M27 31q5 5 10 0" fill="none" stroke="#986f57" stroke-width="1.5"/><circle cx="27" cy="25" r="1"/><circle cx="37" cy="25" r="1"/></svg></div><div><h3>Alice</h3><p>Person A <span class="person-line"></span> the initiator</p></div><span class="person-letter">A</span></div>
-        <label class="private-field" for="a"><span>Private key <b>X<sub>A</sub></b><span class="private-tag">▣ stays here</span></span><input id="a" inputmode="numeric" value="97" autocomplete="off"></label>
-        <div class="key-block"><div class="key-label">PUBLIC KEY <b>Y<sub>A</sub></b><span>↗ shareable</span></div><div class="key-value" id="public-a">—</div><div class="formula" id="public-formula-a">α<sup>XA</sup> mod q</div></div>
-        <div class="received" id="received-a">← Waiting for Bob’s public key</div>
-        <div class="secret-block" id="secret-block-a"><span>SHARED SECRET <b>K<sub>A</sub></b></span><strong id="secret-a">?</strong><small id="secret-formula-a">The secret will appear here</small></div>
-      </article>
-      <div class="channel"><div id="classic-channel"><div class="connection-visual" aria-hidden="true"><div class="connection-line"></div><span class="packet packet-a" id="packet-a">Y<sub>A</sub></span><span class="packet packet-b" id="packet-b">Y<sub>B</sub></span><div class="connection-symbol" id="connection-symbol">↔</div></div><span class="channel-badge" id="channel-badge">OPEN CHANNEL</span><h3 id="channel-title">Ready when you are.</h3><p id="channel-description">Private inputs. Public exchange.<br>A secret only they can calculate.</p><div class="public-pill">q = <span id="display-q">353</span><span class="pill-divider"></span>α = <span id="display-alpha">3</span></div></div>
-        <div id="attacker" class="attacker" hidden><div class="attacker-avatar">⌁</div><span class="attack-eyebrow">ACTIVE ATTACKER</span><h3>Darth</h3><p>Intercepts. Replaces. Relays.</p><div class="attacker-inputs"><label>Private X<sub>DA</sub><input id="da" value="11" inputmode="numeric" aria-label="Darth private key toward Alice"></label><label>Private X<sub>DB</sub><input id="db" value="17" inputmode="numeric" aria-label="Darth private key toward Bob"></label></div><div id="forged-keys" class="attacker-detail">Two identities. Two key exchanges.</div><div id="attacker-secrets" class="attacker-secrets" hidden></div></div>
+  <header class="site-header">
+    <a class="brand" href="#"><span class="brand-mark" aria-hidden="true">↔</span> keyspace<span class="brand-dot">.</span></a>
+    <span class="header-note">DIFFIE–HELLMAN LAB</span>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div><span class="eyebrow">TWO PEOPLE. ONE CONNECTION.</span><h1 id="page-title">Make a shared secret.</h1><p>Enter a private key for each person. Watch the exchange happen.</p></div>
+      <div class="mode-switch" role="group" aria-label="Exchange mode"><button id="normal-mode" class="selected" aria-pressed="true">Normal exchange</button><button id="attack-mode" aria-pressed="false"><span aria-hidden="true">⌁</span> Add attacker</button></div>
+    </section>
+    <section id="lab" class="lab" aria-label="Key exchange calculator">
+      <div class="setup-panel">
+        <div class="setup-intro"><span class="shared-icon" aria-hidden="true">◎</span><div><h2>Shared values</h2><p>Visible to everyone</p></div></div>
+        <label class="parameter" for="q"><span>Prime <b>q</b></span><input id="q" inputmode="numeric" value="353" placeholder="e.g. 353" autocomplete="off" aria-describedby="limits"></label>
+        <label class="parameter" for="alpha"><span>Generator <b>α</b></span><input id="alpha" inputmode="numeric" value="3" placeholder="e.g. 3" autocomplete="off"></label>
+        <p class="parameter-note">Same starting point.<br>Different private keys.</p>
       </div>
-      <article class="person-card bob"><div class="person-heading"><div class="avatar avatar-bob" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M10 64c0-16 10-25 22-25s22 9 22 25" fill="#7774a3"/><ellipse cx="32" cy="27" rx="13" ry="16" fill="#dbad89"/><path d="M18 28c-6-17 5-25 16-23 13-3 16 12 11 24l-3-11c-8 4-13 0-18-2l-3 12Z" fill="#33383f"/><path d="M27 32q5 4 10-1" fill="none" stroke="#8e6652" stroke-width="1.5"/><circle cx="27" cy="25" r="1"/><circle cx="37" cy="25" r="1"/></svg></div><div><h3>Bob</h3><p>Person B <span class="person-line"></span> the responder</p></div><span class="person-letter">B</span></div>
-        <label class="private-field" for="b"><span>Private key <b>X<sub>B</sub></b><span class="private-tag">▣ stays here</span></span><input id="b" inputmode="numeric" value="233" autocomplete="off"></label>
-        <div class="key-block"><div class="key-label">PUBLIC KEY <b>Y<sub>B</sub></b><span>↗ shareable</span></div><div class="key-value" id="public-b">—</div><div class="formula" id="public-formula-b">α<sup>XB</sup> mod q</div></div>
-        <div class="received" id="received-b">→ Waiting for Alice’s public key</div>
-        <div class="secret-block" id="secret-block-b"><span>SHARED SECRET <b>K<sub>B</sub></b></span><strong id="secret-b">?</strong><small id="secret-formula-b">The secret will appear here</small></div>
-      </article>
-    </div>
-    <div id="outcome" class="outcome" aria-live="polite" hidden></div>
-    <div class="playback"><div class="steps" aria-label="Exchange progress"><button data-step="0" class="current"><span>1</span><b>Set up</b></button><i></i><button data-step="1"><span>2</span><b>Public keys</b></button><i></i><button data-step="2"><span>3</span><b>Exchange</b></button><i></i><button data-step="3"><span>4</span><b>Shared secret</b></button></div><div class="play-controls"><button id="reset" class="icon-button" title="Reset exchange" aria-label="Reset exchange">↺</button><button id="play" class="secondary-button">▶ <span>Play all</span></button><button id="next" class="primary-button">Generate public keys <span>→</span></button></div></div>
-    <div class="step-caption" id="step-caption" role="status">01 — Choose public parameters and a private key for each person. Then start the exchange.</div>
-    <form id="practice-form" class="practice-panel" hidden><div><span class="mini-label">YOUR TURN</span><h3 id="practice-question">What shared secret did Alice calculate?</h3><p>Work it out first, then check your answer.</p></div><div class="answer-controls"><label class="sr-only" for="guess">Your secret key answer</label><input id="guess" inputmode="numeric" placeholder="Your answer" autocomplete="off"><button class="primary-button" type="submit">Check answer</button><button id="reveal" class="text-button" type="button">Reveal</button></div><p id="practice-feedback" aria-live="polite"></p></form>
-    <details class="math-panel" id="math-panel"><summary><span><span class="math-icon">ƒx</span> Behind the math <small>Follow every calculation</small></span><span class="plus">+</span></summary><div id="math-content" class="math-content"></div></details>
-  </section>
-
-  <section id="understand" class="understand"><div class="section-label"><span>02 /</span> The idea, without the mystery</div><div class="learning-grid"><article><span class="lesson-icon green">①</span><h3>Keep something private.</h3><p>Alice and Bob each choose a private number, X. It stays with its owner. The public numbers q and α are the same for everyone.</p></article><article><span class="lesson-icon violet">②</span><h3>Share something public.</h3><p>Each calculates Y = α<sup>X</sup> mod q and sends Y across the open channel. With properly chosen, large parameters, reversing this is difficult.</p></article><article><span class="lesson-icon peach">③</span><h3>Meet at the same secret.</h3><p>Raise the received Y to your own private X, modulo q. Both arrive at α<sup>XA × XB</sup> mod q. The secret itself never travels.</p></article></div><div class="attack-explainer"><div class="attack-explainer-icon">⌁</div><div><h3>But who’s on the other end?</h3><p>Basic Diffie–Hellman doesn’t verify identity. An active attacker can replace public keys and agree on a secret with each person. Authenticate the exchange with verified signatures and certificates to prevent this.</p></div><button id="try-attack" class="text-button">See the attack <span>↗</span></button></div></section>
-  <footer><a class="brand footer-brand" href="#">keyspace.</a><span>Built for curious minds &amp; “let me check my answer.”</span><span id="limits">Learning numbers only · 3 ≤ q ≤ 1,000,000,000</span></footer>
-</main>
-</body></html>
+      <div id="validation" class="validation" role="alert" hidden></div>
+      <div class="workspace-bar"><span id="channel-label"><i class="status-dot"></i> PUBLIC CHANNEL</span><span class="workspace-hint">Fill in the boxes below ↓</span></div>
+      <div class="exchange-grid" id="exchange-grid">
+        <article class="person-card alice" aria-labelledby="alice-title">
+          <div class="person-heading"><div class="avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="10"/><path d="M14 56v-4a18 18 0 0 1 36 0v4"/></svg></div><div><h2 id="alice-title">Alice</h2><p>Person A</p></div><span class="person-badge">A</span></div>
+          <label class="private-field" for="a"><span>Private key <b>X<sub>A</sub></b><span class="private-tag">▣ Only Alice</span></span><input id="a" inputmode="numeric" value="97" placeholder="Enter Alice’s key" autocomplete="off"></label>
+          <div class="key-block"><div class="key-description"><span class="key-label">Public key <b>Y<sub>A</sub></b></span><div class="formula" id="public-formula-a">α<sup>XA</sup> mod q</div></div><output class="key-value" id="public-a" aria-label="Alice public key">—</output></div>
+          <div class="received" id="received-a">← Waiting for Bob’s public key</div>
+          <div class="secret-block" id="secret-block-a"><div><span>Shared secret <b>K<sub>A</sub></b></span><small id="secret-formula-a">Calculated after the exchange</small></div><output id="secret-a" aria-label="Alice shared secret">?</output></div>
+        </article>
+        <div class="channel">
+          <div id="classic-channel"><div class="connection-visual" aria-hidden="true"><div class="connection-line"></div><span class="packet packet-a" id="packet-a">Y<sub>A</sub></span><span class="packet packet-b" id="packet-b">Y<sub>B</sub></span><span class="connection-symbol" id="connection-symbol">↔</span></div><span class="channel-badge" id="channel-badge">PUBLIC CHANNEL</span><h3 id="channel-title">Ready to connect</h3><p id="channel-description">Only public keys travel.</p><div class="public-pill">q = <span id="display-q">353</span><span>·</span> α = <span id="display-alpha">3</span></div></div>
+          <div id="attacker" class="attacker" hidden><div class="attacker-heading"><span class="attacker-avatar" aria-hidden="true">⌁</span><div><span class="attack-eyebrow">ATTACKER</span><h3>Darth</h3></div></div><p>Replaces both public keys.</p><div class="attacker-inputs"><label for="da">Key toward Alice<input id="da" value="11" inputmode="numeric" autocomplete="off"></label><label for="db">Key toward Bob<input id="db" value="17" inputmode="numeric" autocomplete="off"></label></div><div id="forged-keys" class="attacker-detail">Two identities. Two exchanges.</div><div id="attacker-secrets" class="attacker-secrets" hidden></div></div>
+        </div>
+        <article class="person-card bob" aria-labelledby="bob-title">
+          <div class="person-heading"><div class="avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="10"/><path d="M14 56v-4a18 18 0 0 1 36 0v4"/></svg></div><div><h2 id="bob-title">Bob</h2><p>Person B</p></div><span class="person-badge">B</span></div>
+          <label class="private-field" for="b"><span>Private key <b>X<sub>B</sub></b><span class="private-tag">▣ Only Bob</span></span><input id="b" inputmode="numeric" value="233" placeholder="Enter Bob’s key" autocomplete="off"></label>
+          <div class="key-block"><div class="key-description"><span class="key-label">Public key <b>Y<sub>B</sub></b></span><div class="formula" id="public-formula-b">α<sup>XB</sup> mod q</div></div><output class="key-value" id="public-b" aria-label="Bob public key">—</output></div>
+          <div class="received" id="received-b">→ Waiting for Alice’s public key</div>
+          <div class="secret-block" id="secret-block-b"><div><span>Shared secret <b>K<sub>B</sub></b></span><small id="secret-formula-b">Calculated after the exchange</small></div><output id="secret-b" aria-label="Bob shared secret">?</output></div>
+        </article>
+      </div>
+      <div id="outcome" class="outcome" aria-live="polite" hidden></div>
+      <div class="controls-panel">
+        <div class="steps" aria-label="Exchange progress"><button data-step="0" class="current"><span>1</span>Set keys</button><i></i><button data-step="1"><span>2</span>Public keys</button><i></i><button data-step="2"><span>3</span>Exchange</button><i></i><button data-step="3"><span>4</span>Secret</button></div>
+        <div class="playback"><p class="step-caption" id="step-caption" role="status">Enter the keys, then start the exchange.</p><div class="play-controls"><button id="reset" class="icon-button" title="Reset exchange" aria-label="Reset exchange">↺</button><button id="next" class="secondary-button">Next step →</button><button id="play" class="primary-button">▶ Start exchange</button></div></div>
+      </div>
+      <form id="practice-form" class="practice-panel" hidden><div><h3 id="practice-question">What shared secret did Alice calculate?</h3><p>Calculate it yourself, then check.</p></div><div class="answer-controls"><label class="sr-only" for="guess">Your secret key answer</label><input id="guess" inputmode="numeric" placeholder="Your answer" autocomplete="off"><button class="primary-button" type="submit">Check</button><button id="reveal" class="text-button" type="button">Reveal</button></div><p id="practice-feedback" aria-live="polite"></p></form>
+      <div class="extras">
+        <details class="options-panel"><summary><span>Examples &amp; practice</span><span class="plus" aria-hidden="true">+</span></summary><div class="options-content"><div class="example-field"><label for="preset">Load an example</label><select id="preset"><option value="chapter">Chapter example · q = 353</option><option value="small">Small example · q = 23</option><option value="tiny">By hand · q = 7</option><option value="custom">Your own values</option></select></div><button id="randomize" class="secondary-button">⤨ Random example</button><label class="practice-toggle"><input type="checkbox" id="practice"><span class="switch-track"></span><span>Test yourself<small>Hide the secret until you solve it.</small></span></label></div></details>
+        <details class="math-panel" id="math-panel"><summary><span>Show the calculations</span><span class="plus" aria-hidden="true">+</span></summary><div id="math-content" class="math-content"></div></details>
+      </div>
+    </section>
+    <details class="explanation" id="understand"><summary>How does it work? <span aria-hidden="true">↗</span></summary><div class="learning-grid"><article><h3>1. Choose private keys</h3><p>q and α are public. Alice chooses X<sub>A</sub> and Bob chooses X<sub>B</sub>. Their private keys stay with them.</p></article><article><h3>2. Exchange public keys</h3><p>Each calculates Y = α<sup>X</sup> mod q. Alice sends Y<sub>A</sub> to Bob, and Bob sends Y<sub>B</sub> to Alice.</p></article><article><h3>3. Calculate the secret</h3><p>Each calculates K = (received Y)<sup>private X</sup> mod q. Both arrive at the same result. The secret itself is never sent.</p></article></div><div class="attack-explainer"><p><strong>What if someone intercepts the exchange?</strong> Basic Diffie–Hellman doesn’t authenticate identities. An attacker can replace the public keys and share a secret with each person. Verified signatures and certificates prevent this substitution.</p><button id="try-attack" class="text-button">Try the attack ↗</button></div></details>
+    <footer><span>Built to make the math click.</span><span id="limits">Learning numbers · 3 ≤ q ≤ 1,000,000,000</span></footer>
+  </main>
+</body>
+</html>
